@@ -55,5 +55,4 @@ class People(db.Model):
             "mass": self.mass,
             "birth_year": self.birth_year,
             "gender": self.gender,
-            "homeworld": self.homeworld
         }
