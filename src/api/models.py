@@ -26,17 +26,21 @@ class User(db.Model):
 class Planets(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, nullable=False)
+    rotation_period = db.Column(db.String(20), unique=True, nullable=False)
+    orbital_period = db.Column(db.String(20), unique=True, nullable=False)
+    climate = db.Column(db.String(20), nullable=False)
     terrain = db.Column(db.String(20), nullable=False)
     population = db.Column(db.String(20), nullable=False)
-    climate = db.Column(db.String(20), nullable=False)
 
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
+            "rotation_period": self.rotation_period,
+            "orbital_period": self.orbital_period,
+            "climate": self.climate,
             "terrain": self.terrain,
             "population": self.population,
-            "climate": self.climate
         }
 
 class People(db.Model):
@@ -44,6 +48,9 @@ class People(db.Model):
     name = db.Column(db.String(20), nullable=False)
     height = db.Column(db.String(20), nullable=False)
     mass = db.Column(db.String(20), nullable=False)
+    hair_color = db.Column(db.String(20), nullable=False)
+    skin_color = db.Column(db.String(20), nullable=False)
+    eye_color = db.Column(db.String(20), nullable=False)
     birth_year = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.String(20), nullable=False)
 
@@ -53,6 +60,9 @@ class People(db.Model):
             "name": self.name,
             "height": self.height,
             "mass": self.mass,
+            "hair_color": self.hair_color,
+            "skin_color": self.skin_color,
+            "eye_color": self.eye_color,
             "birth_year": self.birth_year,
             "gender": self.gender,
         }
