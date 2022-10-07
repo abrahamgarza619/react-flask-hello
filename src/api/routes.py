@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Planets, People
+from api.models import db, User, Planets, People, Favorite
 from api.utils import generate_sitemap, APIException
 
 api = Blueprint('api', __name__)
@@ -174,4 +174,5 @@ def delete_person(person_id):
     db.session.delete(person)
     db.session.commit()
     return f"A person has been deleted! {person.name}"
+
 

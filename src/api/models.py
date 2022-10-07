@@ -2,6 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+db.metadata.clear()
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
@@ -87,10 +89,11 @@ class Favorite(db.Model):
 
 
 class Favorite(db.Model):
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     person = db.Column(db.String(20), nullable=False)
     planet = db.Column(db.String(20), nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey("parent.id"))
+    parent_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     def serialize(self):
         return {
@@ -99,3 +102,5 @@ class Favorite(db.Model):
             "planet": self.planet,
             "parent_id": self.parent_id
         }
+
+ 
