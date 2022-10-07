@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(200), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean(), nullable=False)
-
+    child = db.relationship('Favorite', backref='parent', uselist=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -23,6 +23,9 @@ class User(db.Model):
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }
+
+# planets
+
 class Planets(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=True, nullable=False)
@@ -40,7 +43,7 @@ class Planets(db.Model):
             "orbital_period": self.orbital_period,
             "climate": self.climate,
             "terrain": self.terrain,
-            "population": self.population,
+            "population": self.population
         }
 
 class People(db.Model):
@@ -64,5 +67,35 @@ class People(db.Model):
             "skin_color": self.skin_color,
             "eye_color": self.eye_color,
             "birth_year": self.birth_year,
-            "gender": self.gender,
+            "gender": self.gender
+        }
+
+# favorites model
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    person = db.Column(db.String(20), nullable=False)
+    planet = db.Column(db.String(20), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "person": self.person,
+            "planet": self.planet
+        }
+
+
+
+class Favorite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    person = db.Column(db.String(20), nullable=False)
+    planet = db.Column(db.String(20), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey("parent.id"))
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "person": self.person,
+            "planet": self.planet,
+            "parent_id": self.parent_id
         }
