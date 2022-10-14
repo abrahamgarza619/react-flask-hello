@@ -15,20 +15,35 @@ api = Blueprint('api', __name__)
 def create_user():
     request_body = request.get_json()
     password = request_body['password']
-    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    # converting password to array of bytes
+    password_bytes = password.encode('utf-8')
+    # generating the salt
+    salt = bcrypt.gensalt()
+    # Hashing the password
+    hashed = bcrypt.hashpw(password_bytes, salt)
     new_user = User(
         first_name = request_body['first_name'],
         last_name = request_body['last_name'],
         email = request_body['email'],
         # password hashed result is a binary string 
         # need to decode hashed ase64 result to unicode string befor save it to database!
+        salt = salt.decode('utf-8', 'ignore'),
         password = hashed.decode('utf-8', 'ignore'),
         is_active = True
     )
     db.session.add(new_user)
     db.session.commit()
     access_token = create_access_token(identity=request_body['email'])
-    return access_token
+    return new_user
+
+@api.route('/login', methods=['POST'])
+def login_user():
+    request_body = request.get_json()
+    email = request_body['email']
+    password = request_body['password']
+    # query database for user
+    user = User.query.filter_by(email=email).first()
+    return user.password
 
 @api.route('/user', methods=['GET'])
 @jwt_required()

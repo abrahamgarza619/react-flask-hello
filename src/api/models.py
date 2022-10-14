@@ -10,6 +10,7 @@ class User(db.Model):
     last_name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    salt = db.Column(db.String(200), nullable=False)
     is_active = db.Column(db.Boolean(), nullable=False)
     child = db.relationship('Favorite', backref='parent', uselist=False)
 
