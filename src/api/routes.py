@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Planets, People, Favorite
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token, jwt_required
+import bcrypt
 
 api = Blueprint('api', __name__)
 
@@ -13,11 +14,15 @@ api = Blueprint('api', __name__)
 @api.route('/register', methods=['POST'])
 def create_user():
     request_body = request.get_json()
+    password = request_body['password']
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     new_user = User(
         first_name = request_body['first_name'],
         last_name = request_body['last_name'],
         email = request_body['email'],
-        password = request_body['password'],
+        # password hashed result is a binary string 
+        # need to decode hashed ase64 result to unicode string befor save it to database!
+        password = hashed.decode('utf-8', 'ignore'),
         is_active = True
     )
     db.session.add(new_user)
