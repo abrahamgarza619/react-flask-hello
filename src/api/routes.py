@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Planets, People, Favorite
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token, jwt_required
+import bcrypt
 
 api = Blueprint('api', __name__)
 
@@ -13,11 +14,13 @@ api = Blueprint('api', __name__)
 @api.route('/register', methods=['POST'])
 def create_user():
     request_body = request.get_json()
+    password = request_body['password']
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
     new_user = User(
         first_name = request_body['first_name'],
         last_name = request_body['last_name'],
         email = request_body['email'],
-        password = request_body['password'],
+        password = hashed,
         is_active = True
     )
     db.session.add(new_user)
@@ -25,8 +28,19 @@ def create_user():
     access_token = create_access_token(identity=request_body['email'])
     return access_token
 
+@api.route('/login', methods=['POST'])
+def login():
+    request_body = request.get_json()
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+    # query db to find user
+    user = User.query.filter_by(email=email).first()
+    access_token = create_access_token(identity=email)
+    if bcrypt.checkpw(password.encode(), user.password.encode()):
+        return access_token
+    return user.password
+
 @api.route('/user', methods=['GET'])
-@jwt_required()
 def get_users():
     allUsers = User.query.all()
     user_list = list(map(lambda x: x.serialize(), allUsers))
@@ -38,7 +52,7 @@ def delete_user(user_id):
     if user is None:
         raise APIException("User not found!", status_code=405)
         db.session.delete(user)
-    db.session.delte(user)
+    db.session.delete(user)
     db.session.commit()
     return f"A user has been deleted! {user.email}"
 
